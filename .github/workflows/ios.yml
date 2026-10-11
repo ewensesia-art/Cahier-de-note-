@@ -1,6 +1,9 @@
 name: Build iOS
 
 on:
+  push:
+    branches:
+      - capacitor-ios
   workflow_dispatch:
 
 jobs:
