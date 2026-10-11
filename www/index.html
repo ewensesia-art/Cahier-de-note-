@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Ewen Notes</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    --yellow: #ffcc33;
+    --background: #ffffff;
+    --secondary: #f2f2f7;
+    --text: #1c1c1e;
+    --muted: #8e8e93;
+    --border: #e5e5ea;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--background);
+    color: var(--text);
+}
+
+button, input, textarea, select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:active {
+    opacity: 0.7;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+h1 {
+    font-size: 29px;
+    margin: 0;
+    font-weight: 750;
+    letter-spacing: -0.8px;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.round-button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    background: var(--yellow);
+    color: #222;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.search {
+    width: 100%;
+    border: none;
+    background: var(--secondary);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 17px;
+    outline: none;
+    font-size: 16px;
+}
+
+.container {
+    padding: 16px;
+    padding-bottom: 110px;
+}
+
+.section-title {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 19px 0 10px;
+}
+
+.section-title:first-child {
+    margin-top: 0;
+}
+
+.folder-list {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+}
+
+.folder-list::-webkit-scrollbar {
+    display: none;
+}
+
+.folder {
+    border: 1px solid var(--border);
+    background: white;
+    padding: 12px;
+    border-radius: 14px;
+    min-width: 112px;
+    max-width: 160px;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+.folder.active {
+    background: #fff5cf;
+    border-color: var(--yellow);
+}
+
+.folder-icon {
+    font-size: 25px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.folder-name {
+    font-size: 14px;
+    font-weight: 650;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.folder-count {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    display: block;
+}
+
+.folder-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 7px;
+}
+
+.small-button {
+    border: none;
+    background: var(--secondary);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+.note-card {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    background: white;
+    padding: 15px 3px;
+    text-align: left;
+    display: block;
+}
+
+.note-card-title {
+    font-weight: 650;
+    font-size: 17px;
+    overflow-wrap: anywhere;
+}
+
+.note-card-preview {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 5px;
+    line-height: 1.4;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.note-card-date {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 7px;
+}
+
+.note-card-image {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 9px;
+    margin-right: 5px;
+}
+
+.empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 45px 15px;
+    line-height: 1.6;
+}
+
+.empty-icon {
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 8px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 20;
+}
+
+.bottom-button {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    min-width: 65px;
+}
+
+.bottom-button span {
+    display: block;
+    font-size: 23px;
+    margin-bottom: 3px;
+}
+
+.bottom-button.active {
+    color: #b18400;
+    font-weight: 700;
+}
+
+#editorScreen {
+    display: none;
+    background: white;
+    min-height: 100vh;
+}
+
+.editor-header {
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,0.97);
+    border-bottom: 1px solid var(--border);
+    padding: 12px;
+    z-index: 10;
+}
+
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.text-button {
+    background: transparent;
+    border: none;
+    color: #a57a00;
+    padding: 9px 4px;
+    font-size: 14px;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.editor-title {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 27px;
+    font-weight: 750;
+    padding: 18px 18px 8px;
+    color: var(--text);
+}
+
+.editor-meta {
+    color: var(--muted);
+    font-size: 12px;
+    padding: 0 19px 12px;
+}
+
+.editor-folder {
+    margin: 8px 18px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px;
+    background: white;
+    max-width: calc(100% - 36px);
+}
+
+.editor-content {
+    display: block;
+    width: 100%;
+    min-height: 35vh;
+    border: none;
+    resize: vertical;
+    outline: none;
+    padding: 8px 19px 25px;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--text);
+    background: white;
+}
+
+.image-section {
+    padding: 10px 18px 35px;
+}
+
+.image-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.image-heading h3 {
+    font-size: 17px;
+    margin: 0;
+}
+
+.add-image-button {
+    border: none;
+    background: #fff3c4;
+    padding: 10px 13px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 650;
+    color: #705400;
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.image-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 13px;
+    background: var(--secondary);
+    aspect-ratio: 1 / 1;
+}
+
+.image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.image-open {
+    padding: 0;
+    border: none;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
+
+.image-delete {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 31px;
+    height: 31px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 18px;
+    z-index: 2;
+}
+
+.no-images {
+    color: var(--muted);
+    font-size: 14px;
+    padding: 18px 10px;
+    background: #f7f7f9;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+}
+
+.modal {
+    width: 100%;
+    max-width: 360px;
+    background: white;
+    padding: 22px;
+    border-radius: 20px;
+    box-shadow: 0 12px 50px rgba(0,0,0,0.15);
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modal h2 {
+    margin: 0 0 16px;
+    font-size: 21px;
+}
+
+.modal input, .modal select {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 13px;
+    outline: none;
+    background: white;
+    margin-bottom: 12px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.modal-buttons button {
+    border: none;
+    padding: 11px 15px;
+    border-radius: 11px;
+}
+
+.cancel-button {
+    background: var(--secondary);
+}
+
+.confirm-button {
+    background: var(--yellow);
+    font-weight: 700;
+}
+
+.toast {
+    position: fixed;
+    bottom: 95px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #292929;
+    color: white;
+    padding: 11px 17px;
+    border-radius: 12px;
+    font-size: 13px;
+    z-index: 200;
+    display: none;
+    max-width: 90%;
+    text-align: center;
+}
+
+#imageViewer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(0,0,0,0.96);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 15px;
+}
+
+#imageViewer img {
+    max-width: 100%;
+    max-height: 82vh;
+    object-fit: contain;
+}
+
+.viewer-close {
+    align-self: flex-end;
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 32px;
+    padding: 5px 12px 15px;
+}
+
+@media (min-width: 700px) {
+    .container {
+        max-width: 800px;
+        margin: auto;
+    }
+
+    header {
+        padding-left: max(20px, calc((100vw - 760px) / 2));
+        padding-right: max(20px, calc((100vw - 760px) / 2));
+    }
+
+    .editor-content, .editor-title {
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+
+    .image-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="homeScreen">
+
+<header>
+    <div class="topbar">
+        <div>
+            <h1>Notes</h1>
+            <div class="subtitle" id="noteCount">Tes idées, au même endroit.</div>
+        </div>
+        <button class="round-button" onclick="newNote()" aria-label="Créer une note">+</button>
+    </div>
+
+    <input class="search" id="searchInput" type="search"
+           placeholder="🔍 Rechercher une note..."
+           oninput="renderNotes()">
+</header>
+
+<main class="container">
+
+    <div class="section-title">Mes dossiers</div>
+
+    <div class="folder-list" id="folderList"></div>
+
+    <div class="folder-actions">
+        <button class="small-button" onclick="createFolder()">＋ Nouveau dossier</button>
+        <button class="small-button" onclick="manageFolders()">⚙️ Gérer</button>
+    </div>
+
+    <div class="section-title" id="notesHeading">Toutes mes notes</div>
+
+    <div id="notesList"></div>
+
+</main>
+
+<nav class="bottom-bar">
+    <button class="bottom-button active" id="navAll" onclick="showAllNotes()">
+        <span>📝</span>Notes
+    </button>
+    <button class="bottom-button" id="navFolders" onclick="focusFolders()">
+        <span>📁</span>Dossiers
+    </button>
+    <button class="bottom-button" onclick="newNote()">
+        <span>✚</span>Nouvelle
+    </button>
+</nav>
+
+</div>
+
+<div id="editorScreen">
+
+    <div class="editor-header">
+        <div class="editor-toolbar">
+            <button class="text-button" onclick="closeEditor()">‹ Notes</button>
+
+            <div class="editor-actions">
+                <button class="text-button" onclick="renameCurrentNote()">Renommer</button>
+                <button class="text-button" onclick="deleteCurrentNote()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <input id="editorTitle" class="editor-title"
+           placeholder="Titre de la note"
+           maxlength="120">
+
+    <div class="editor-meta" id="editorDate">Nouvelle note</div>
+
+    <select class="editor-folder" id="editorFolder"
+            onchange="changeNoteFolder()"
+            aria-label="Dossier de la note"></select>
+
+    <textarea id="editorContent" class="editor-content"
+              placeholder="Commence à écrire..."></textarea>
+
+    <section class="image-section">
+        <div class="image-heading">
+            <h3>🖼️ Images</h3>
+            <button class="add-image-button" onclick="chooseImages()">
+                ＋ Ajouter
+            </button>
+        </div>
+
+        <div id="imageGrid" class="image-grid"></div>
+    </section>
+
+</div>
+
+<input type="file" id="imagePicker"
+       accept="image/*" multiple
+       style="display:none">
+
+<div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+        <h2 id="modalTitle">Nouvelle note</h2>
+        <div id="modalFields"></div>
+        <div class="modal-buttons">
+            <button class="cancel-button" onclick="closeModal()">Annuler</button>
+            <button class="confirm-button" id="modalConfirm">Créer</button>
+        </div>
+    </div>
+</div>
+
+<div id="imageViewer">
+    <button class="viewer-close" onclick="closeImageViewer()">✕</button>
+    <img id="viewerImage" src="" alt="Image agrandie">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+const STORAGE_KEY = "ewen_notes_data_v2";
+
+let data;
+let currentNoteId = null;
+let currentFolderId = "all";
+let toastTimer;
+
+function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+}
+
+function defaultData() {
+    return {
+        folders: [
+            { id: "general", name: "Général", emoji: "📂" },
+            { id: "code", name: "Ewen Code", emoji: "💻" },
+            { id: "devoirs", name: "Devoirs", emoji: "📚" },
+            { id: "messages", name: "Messages", emoji: "💬" }
+        ],
+        notes: []
+    };
+}
+
+function loadData() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+
+        if (saved) {
+            const parsed = JSON.parse(saved);
+
+            if (parsed && Array.isArray(parsed.folders)
+                && Array.isArray(parsed.notes)) {
+                data = parsed;
+
+                if (!data.folders.some(f => f.id === "general")) {
+                    data.folders.unshift({
+                        id: "general",
+                        name: "Général",
+                        emoji: "📂"
+                    });
+                }
+
+                data.notes.forEach(note => {
+                    if (!data.folders.some(f => f.id === note.folderId)) {
+                        note.folderId = "general";
+                    }
+
+                    if (!Array.isArray(note.images)) {
+                        note.images = [];
+                    }
+                });
+
+                return;
+            }
+        }
+    } catch (error) {
+        console.error("Erreur de lecture :", error);
+    }
+
+    data = defaultData();
+    saveData();
+}
+
+function saveData() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return true;
+    } catch (error) {
+        showToast("Stockage plein : certaines images sont peut-être trop lourdes.");
+        return false;
+    }
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+function getFolder(id) {
+    return data.folders.find(folder => folder.id === id);
+}
+
+function getCurrentNote() {
+    return data.notes.find(note => note.id === currentNoteId);
+}
+
+function formatDate(timestamp) {
+    return new Date(timestamp).toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.display = "block";
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+        toast.style.display = "none";
+    }, 2600);
+}
+
+function renderFolders() {
+    const list = document.getElementById("folderList");
+
+    const allCount = data.notes.length;
+
+    let html = `
+        <button class="folder ${currentFolderId === "all" ? "active" : ""}"
+                onclick="selectFolder('all')">
+            <span class="folder-icon">🗂️</span>
+            <span class="folder-name">Toutes</span>
+            <span class="folder-count">${allCount} note${allCount !== 1 ? "s" : ""}</span>
+        </button>
+    `;
+
+    data.folders.forEach(folder => {
+        const count = data.notes.filter(note =>
+            note.folderId === folder.id
+        ).length;
+
+        html += `
+            <button class="folder ${currentFolderId === folder.id ? "active" : ""}"
+                    onclick="selectFolder('${folder.id}')">
+                <span class="folder-icon">${escapeHTML(folder.emoji)}</span>
+                <span class="folder-name">${escapeHTML(folder.name)}</span>
+                <span class="folder-count">${count} note${count !== 1 ? "s" : ""}</span>
+            </button>
+        `;
+    });
+
+    list.innerHTML = html;
+}
+
+function renderNotes() {
+    renderFolders();
+
+    const query = document.getElementById("searchInput").value
+        .trim().toLowerCase();
+
+    const visibleNotes = data.notes
+        .filter(note => {
+            const folderMatch = currentFolderId === "all"
+                || note.folderId === currentFolderId;
+
+            const textMatch = !query
+                || (note.title || "").toLowerCase().includes(query)
+                || (note.content || "").toLowerCase().includes(query);
+
+            return folderMatch && textMatch;
+        })
+        .sort((a, b) => b.updatedAt - a.updatedAt);
+
+    const folder = getFolder(currentFolderId);
+
+    document.getElementById("notesHeading").textContent =
+        currentFolderId === "all"
+            ? "Toutes mes notes"
+            : "Notes · " + folder.name;
+
+    document.getElementById("noteCount").textContent =
+        data.notes.length + " note" +
+        (data.notes.length !== 1 ? "s" : "") +
+        " enregistrée" +
+        (data.notes.length !== 1 ? "s" : "");
+
+    const list = document.getElementById("notesList");
+
+    if (visibleNotes.length === 0) {
+        list.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">${query ? "🔎" : "📝"}</div>
+                <div><strong>${query ? "Aucun résultat" : "Aucune note pour le moment"}</strong></div>
+                <div>${query ? "Essaie avec d'autres mots." : "Appuie sur le bouton + pour écrire ta première note."}</div>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = visibleNotes.map(note => {
+        const title = note.title.trim() || "Nouvelle note";
+        const preview = note.content.trim() || "Aucun texte";
+        const folderName = getFolder(note.folderId)?.name || "Général";
+
+        const images = Array.isArray(note.images) ? note.images : [];
+
+        const imagePreview = images.length
+            ? `<img class="note-card-image" src="${images[0].data}" alt="Image de la note">`
+            : "";
+
+        return `
+            <button class="note-card" onclick="openNote('${note.id}')">
+                <div class="note-card-title">${escapeHTML(title)}</div>
+                <div class="note-card-preview">${escapeHTML(preview)}</div>
+                ${imagePreview}
+                <div class="note-card-date">
+                    ${escapeHTML(folderName)} · ${escapeHTML(formatDate(note.updatedAt))}
+                    ${images.length ? " · 🖼️ " + images.length : ""}
+                </div>
+            </button>
+        `;
+    }).join("");
+}
+
+function selectFolder(id) {
+    currentFolderId = id;
+
+    document.getElementById("navAll").classList.toggle("active", id === "all");
+    document.getElementById("navFolders").classList.toggle("active", id !== "all");
+
+    renderNotes();
+}
+
+function showAllNotes() {
+    currentFolderId = "all";
+
+    document.getElementById("navAll").classList.add("active");
+    document.getElementById("navFolders").classList.remove("active");
+
+    renderNotes();
+}
+
+function focusFolders() {
+    document.getElementById("folderList").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+
+    document.getElementById("navFolders").classList.add("active");
+    document.getElementById("navAll").classList.remove("active");
+}
+
+function createFolder() {
+    openModal("Créer un dossier", `
+        <input id="folderNameInput" placeholder="Nom du dossier" maxlength="50">
+        <select id="folderEmojiInput">
+            <option value="📁">📁 Dossier classique</option>
+            <option value="💻">💻 Informatique</option>
+            <option value="📚">📚 École</option>
+            <option value="💬">💬 Messages</option>
+            <option value="⭐">⭐ Favoris</option>
+            <option value="💡">💡 Idées</option>
+            <option value="🎮">🎮 Jeux</option>
+            <option value="📷">📷 Photos</option>
+            <option value="📝">📝 Personnel</option>
+            <option value="🎵">🎵 Musique</option>
+        </select>
+    `, () => {
+        const name = document.getElementById("folderNameInput").value.trim();
+        const emoji = document.getElementById("folderEmojiInput").value;
+
+        if (!name) {
+            showToast("Donne un nom au dossier.");
+            return false;
+        }
+
+        if (data.folders.some(folder =>
+            folder.name.toLowerCase() === name.toLowerCase()
+        )) {
+            showToast("Ce dossier existe déjà.");
+            return false;
+        }
+
+        const folder = { id: uid(), name, emoji };
+
+        data.folders.push(folder);
+        currentFolderId = folder.id;
+
+        saveData();
+        renderNotes();
+        showToast("Dossier créé !");
+
+        return true;
+    });
+
+    setTimeout(() => document.getElementById("folderNameInput")?.focus(), 100);
+}
+
+function manageFolders() {
+    const options = data.folders.map(folder =>
+        `<option value="${folder.id}">${escapeHTML(folder.emoji)} ${escapeHTML(folder.name)}</option>`
+    ).join("");
+
+    openModal("Gérer les dossiers", `
+        <p style="font-size:14px;color:#777;margin-top:0">
+            Renommer ou supprimer un dossier. Ses notes seront déplacées vers Général.
+        </p>
+        <select id="manageFolderSelect">${options}</select>
+        <input id="manageFolderName" placeholder="Nouveau nom">
+        <div style="display:flex;gap:8px">
+            <button type="button" class="small-button" style="flex:1"
+                    onclick="renameFolderFromManager()">Renommer</button>
+            <button type="button" class="small-button" style="flex:1;color:#c00"
+                    onclick="deleteFolderFromManager()">Supprimer</button>
+        </div>
+    `, () => true, "Terminer");
+
+    const select = document.getElementById("manageFolderSelect");
+
+    select.addEventListener("change", () => {
+        const folder = getFolder(select.value);
+        document.getElementById("manageFolderName").value =
+            folder ? folder.name : "";
+    });
+
+    select.dispatchEvent(new Event("change"));
+}
+
+function renameFolderFromManager() {
+    const select = document.getElementById("manageFolderSelect");
+    const input = document.getElementById("manageFolderName");
+
+    const folder = getFolder(select.value);
+    const name = input.value.trim();
+
+    if (!folder || !name) {
+        showToast("Entre un nom valide.");
+        return;
+    }
+
+    if (data.folders.some(other =>
+        other.id !== folder.id &&
+        other.name.toLowerCase() === name.toLowerCase()
+    )) {
+        showToast("Ce nom est déjà utilisé.");
+        return;
+    }
+
+    folder.name = name;
+
+    saveData();
+    renderNotes();
+    showToast("Dossier renommé.");
+
+    manageFolders();
+}
+
+function deleteFolderFromManager() {
+    const select = document.getElementById("manageFolderSelect");
+    const folder = getFolder(select.value);
+
+    if (!folder) return;
+
+    if (folder.id === "general") {
+        showToast("Le dossier Général ne peut pas être supprimé.");
+        return;
+    }
+
+    if (!confirm('Supprimer "' + folder.name +
+        '" ? Ses notes seront déplacées vers Général.')) {
+        return;
+    }
+
+    data.notes.forEach(note => {
+        if (note.folderId === folder.id) {
+            note.folderId = "general";
+            note.updatedAt = Date.now();
+        }
+    });
+
+    data.folders = data.folders.filter(f => f.id !== folder.id);
+
+    if (currentFolderId === folder.id) currentFolderId = "all";
+
+    saveData();
+    renderNotes();
+    showToast("Dossier supprimé.");
+
+    manageFolders();
+}
+
+function newNote() {
+    const defaultFolder = currentFolderId !== "all"
+        ? currentFolderId
+        : "general";
+
+    const options = data.folders.map(folder =>
+        `<option value="${folder.id}" ${folder.id === defaultFolder ? "selected" : ""}>${escapeHTML(folder.emoji)} ${escapeHTML(folder.name)}</option>`
+    ).join("");
+
+    openModal("Nouvelle note", `
+        <input id="newNoteTitle" placeholder="Nom de la note" maxlength="120">
+        <select id="newNoteFolder">${options}</select>
+    `, () => {
+        const title = document.getElementById("newNoteTitle").value.trim();
+        const folderId = document.getElementById("newNoteFolder").value;
+
+        if (!title) {
+            showToast("Donne un nom à ta note.");
+            return false;
+        }
+
+        const note = {
+            id: uid(),
+            title,
+            content: "",
+            folderId,
+            images: [],
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+
+        data.notes.push(note);
+        saveData();
+        renderNotes();
+        openNote(note.id);
+
+        return true;
+    }, "Créer");
+
+    setTimeout(() => document.getElementById("newNoteTitle")?.focus(), 100);
+}
+
+function openNote(id) {
+    const note = data.notes.find(item => item.id === id);
+    if (!note) return;
+
+    currentNoteId = id;
+
+    if (!Array.isArray(note.images)) note.images = [];
+
+    document.getElementById("homeScreen").style.display = "none";
+    document.getElementById("editorScreen").style.display = "block";
+
+    document.getElementById("editorTitle").value = note.title;
+    document.getElementById("editorContent").value = note.content;
+
+    document.getElementById("editorDate").textContent =
+        "Modifiée le " + formatDate(note.updatedAt);
+
+    renderEditorFolders();
+    renderImages();
+
+    window.scrollTo(0, 0);
+}
+
+function renderEditorFolders() {
+    const select = document.getElementById("editorFolder");
+    const note = getCurrentNote();
+
+    if (!note) return;
+
+    select.innerHTML = data.folders.map(folder =>
+        `<option value="${folder.id}" ${folder.id === note.folderId ? "selected" : ""}>${escapeHTML(folder.emoji)} ${escapeHTML(folder.name)}</option>`
+    ).join("");
+}
+
+function saveCurrentNote() {
+    const note = getCurrentNote();
+    if (!note) return;
+
+    note.title = document.getElementById("editorTitle").value;
+    note.content = document.getElementById("editorContent").value;
+    note.updatedAt = Date.now();
+
+    saveData();
+
+    document.getElementById("editorDate").textContent =
+        "Modifiée le " + formatDate(note.updatedAt);
+}
+
+function changeNoteFolder() {
+    const note = getCurrentNote();
+    if (!note) return;
+
+    note.folderId = document.getElementById("editorFolder").value;
+    note.updatedAt = Date.now();
+
+    saveData();
+    renderNotes();
+
+    showToast("Note déplacée dans le dossier.");
+}
+
+function closeEditor() {
+    saveCurrentNote();
+
+    document.getElementById("editorScreen").style.display = "none";
+    document.getElementById("homeScreen").style.display = "block";
+
+    currentNoteId = null;
+
+    renderNotes();
+    window.scrollTo(0, 0);
+}
+
+/* AJOUTER DES IMAGES */
+
+function chooseImages() {
+    if (!getCurrentNote()) return;
+
+    const picker = document.getElementById("imagePicker");
+    picker.setAttribute("accept", "image/*");
+    picker.removeAttribute("capture");
+    picker.click();
+}
+
+document.getElementById("imagePicker").addEventListener("change", async function(event) {
+    const files = Array.from(event.target.files || []);
+    const note = getCurrentNote();
+
+    if (!note || files.length === 0) {
+        event.target.value = "";
+        return;
+    }
+
+    if (!Array.isArray(note.images)) note.images = [];
+
+    for (const file of files) {
+        if (!file.type.startsWith("image/")) {
+            showToast("Choisis un fichier image.");
+            continue;
+        }
+
+        try {
+            showToast("Préparation de l'image...");
+
+            const compressed = await compressImage(file);
+
+            note.images.push({
+                id: uid(),
+                data: compressed,
+                name: file.name || "Image"
+            });
+
+            note.updatedAt = Date.now();
+
+            const success = saveData();
+
+            renderImages();
+            renderNotes();
+
+            if (success) {
+                showToast("Image ajoutée à ta note !");
+            }
+        } catch (error) {
+            console.error(error);
+            showToast("Impossible de charger cette image.");
+        }
+    }
+
+    event.target.value = "";
+});
+
+function compressImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onerror = () => reject(new Error("Lecture impossible"));
+
+        reader.onload = () => {
+            const img = new Image();
+
+            img.onerror = () => reject(new Error("Image invalide"));
+
+            img.onload = () => {
+                const maxSize = 1400;
+
+                let width = img.width;
+                let height = img.height;
+
+                const scale = Math.min(1, maxSize / Math.max(width, height));
+
+                width = Math.max(1, Math.round(width * scale));
+                height = Math.max(1, Math.round(height * scale));
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+
+                const context = canvas.getContext("2d");
+
+                if (!context) {
+                    reject(new Error("Canvas indisponible"));
+                    return;
+                }
+
+                context.fillStyle = "#ffffff";
+                context.fillRect(0, 0, width, height);
+
+                context.drawImage(img, 0, 0, width, height);
+
+                resolve(canvas.toDataURL("image/jpeg", 0.75));
+            };
+
+            img.src = reader.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+
+function renderImages() {
+    const note = getCurrentNote();
+    const grid = document.getElementById("imageGrid");
+
+    if (!note) {
+        grid.innerHTML = "";
+        return;
+    }
+
+    if (!Array.isArray(note.images)) note.images = [];
+
+    if (note.images.length === 0) {
+        grid.innerHTML = `
+            <div class="no-images" style="grid-column:1/-1">
+                Aucune image pour le moment.<br>
+                Appuie sur « ＋ Ajouter » pour choisir une photo.
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = note.images.map(image => `
+        <div class="image-item">
+            <button class="image-open"
+                    onclick="openImageViewer('${image.id}')"
+                    aria-label="Agrandir l'image">
+                <img src="${image.data}" alt="${escapeHTML(image.name || "Image de la note")}">
+            </button>
+            <button class="image-delete"
+                    onclick="deleteImage('${image.id}')"
+                    aria-label="Supprimer cette image">×</button>
+        </div>
+    `).join("");
+}
+
+function openImageViewer(imageId) {
+    const note = getCurrentNote();
+    if (!note) return;
+
+    const image = note.images.find(item => item.id === imageId);
+    if (!image) return;
+
+    document.getElementById("viewerImage").src = image.data;
+    document.getElementById("imageViewer").style.display = "flex";
+}
+
+function closeImageViewer() {
+    document.getElementById("imageViewer").style.display = "none";
+    document.getElementById("viewerImage").src = "";
+}
+
+function deleteImage(imageId) {
+    const note = getCurrentNote();
+    if (!note) return;
+
+    if (!confirm("Supprimer cette image de la note ?")) return;
+
+    note.images = note.images.filter(image => image.id !== imageId);
+    note.updatedAt = Date.now();
+
+    saveData();
+    renderImages();
+    renderNotes();
+
+    showToast("Image supprimée.");
+}
+
+function renameCurrentNote() {
+    const note = getCurrentNote();
+    if (!note) return;
+
+    openModal("Renommer la note", `
+        <input id="renameNoteInput" value="${escapeHTML(note.title)}" maxlength="120">
+    `, () => {
+        const title = document.getElementById("renameNoteInput").value.trim();
+
+        if (!title) {
+            showToast("Le titre ne peut pas être vide.");
+            return false;
+        }
+
+        note.title = title;
+        note.updatedAt = Date.now();
+
+        document.getElementById("editorTitle").value = title;
+
+        saveData();
+        renderNotes();
+
+        showToast("Note renommée.");
+
+        return true;
+    }, "Enregistrer");
+
+    setTimeout(() => document.getElementById("renameNoteInput")?.focus(), 100);
+}
+
+function deleteCurrentNote() {
+    const note = getCurrentNote();
+    if (!note) return;
+
+    if (!confirm('Supprimer définitivement la note "' +
+        (note.title || "Sans titre") + '" ?')) {
+        return;
+    }
+
+    data.notes = data.notes.filter(item => item.id !== note.id);
+
+    saveData();
+
+    document.getElementById("editorScreen").style.display = "none";
+    document.getElementById("homeScreen").style.display = "block";
+
+    currentNoteId = null;
+
+    renderNotes();
+    showToast("Note supprimée.");
+}
+
+function openModal(title, fieldsHTML, onConfirm, confirmText = "Créer") {
+    document.getElementById("modalTitle").textContent = title;
+    document.getElementById("modalFields").innerHTML = fieldsHTML;
+    document.getElementById("modalConfirm").textContent = confirmText;
+
+    document.getElementById("modalConfirm").onclick = () => {
+        const result = onConfirm();
+
+        if (result !== false) {
+            closeModal();
+        }
+    };
+
+    document.getElementById("modalBackdrop").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("modalBackdrop").style.display = "none";
+    document.getElementById("modalFields").innerHTML = "";
+}
+
+document.getElementById("editorTitle").addEventListener("input", () => {
+    saveCurrentNote();
+});
+
+document.getElementById("editorContent").addEventListener("input", () => {
+    saveCurrentNote();
+});
+
+document.getElementById("modalBackdrop").addEventListener("click", event => {
+    if (event.target.id === "modalBackdrop") closeModal();
+});
+
+document.getElementById("imageViewer").addEventListener("click", event => {
+    if (event.target.id === "imageViewer") closeImageViewer();
+});
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeModal();
+        closeImageViewer();
+    }
+});
+
+loadData();
+renderNotes();
+</script>
+</body>
+</html>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js");
+  });
+}
+</script>
