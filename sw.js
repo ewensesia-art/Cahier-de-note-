@@ -1,28 +1,48 @@
-const CACHE_NAME = "ewen-notes-v1";
+const CACHE_NAME = "ewen-notes-v2";
+
+const FILES_TO_CACHE = [
+  "./",
+  "./index.html"
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.addAll([
-        "./",
-        "./index.html"
-      ])
-    )
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
   );
+
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) =>
+      Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      )
+    )
+  );
+
+  self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) return cachedResponse;
 
       return fetch(event.request).catch(() => {
-        return caches.match("./index.html");
+        if (event.request.mode === "navigate") {
+          return caches.match("./index.html");
+        }
+
+        return new Response("", {
+          status: 503,
+          statusText: "Hors connexion"
+        });
       });
     })
   );
