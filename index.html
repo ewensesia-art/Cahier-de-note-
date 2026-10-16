@@ -826,7 +826,7 @@ function renderNotes() {
     document.getElementById("notesHeading").textContent =
         currentFolderId === "all"
             ? "Toutes mes notes"
-            : "Notes · " + folder.name;
+            : "Notes · " + (folder ? folder.name : "Général");
 
     document.getElementById("noteCount").textContent =
         data.notes.length + " note" +
@@ -848,8 +848,8 @@ function renderNotes() {
     }
 
     list.innerHTML = visibleNotes.map(note => {
-        const title = note.title.trim() || "Nouvelle note";
-        const preview = note.content.trim() || "Aucun texte";
+        const title = (note.title || "").trim() || "Nouvelle note";
+        const preview = (note.content || "").trim() || "Aucun texte";
         const folderName = getFolder(note.folderId)?.name || "Général";
 
         const images = Array.isArray(note.images) ? note.images : [];
@@ -1092,8 +1092,8 @@ function openNote(id) {
     document.getElementById("homeScreen").style.display = "none";
     document.getElementById("editorScreen").style.display = "block";
 
-    document.getElementById("editorTitle").value = note.title;
-    document.getElementById("editorContent").value = note.content;
+    document.getElementById("editorTitle").value = note.title || "";
+    document.getElementById("editorContent").value = note.content || "";
 
     document.getElementById("editorDate").textContent =
         "Modifiée le " + formatDate(note.updatedAt);
@@ -1426,12 +1426,17 @@ document.addEventListener("keydown", event => {
 loadData();
 renderNotes();
 </script>
-</body>
-</html>
+
 <script>
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js");
-  });
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+            .catch(error => {
+                console.error("Erreur Service Worker :", error);
+            });
+    });
 }
 </script>
+
+</body>
+</html>
